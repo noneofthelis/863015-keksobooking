@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Alisa Ianovskaia](https://up.htmlacademy.ru/javascript/16/user/863015).
-* Наставник: `Неизвестно`.
+* Наставник: `Кекс`.
 
 ---
 
