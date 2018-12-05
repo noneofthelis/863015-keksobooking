@@ -43,7 +43,7 @@
   }
 
   function renderCallbackMessage(selector, elementToInsertTo) {
-    var template = document.querySelector('#' + selector).content.querySelector('.' + selector).cloneNode(true)
+    var template = document.querySelector('#' + selector).content.querySelector('.' + selector).cloneNode(true);
     var fragment = document.createDocumentFragment();
     fragment.appendChild(template);
     elementToInsertTo.appendChild(fragment);
@@ -79,7 +79,7 @@
       element.querySelector('.popup__text--price').alt = object.offer.price + '₽/ночь';
       element.querySelector('.popup__type').textContent = apartmentsTypeMap[object.offer.type];
       element.querySelector('.popup__text--capacity').textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
-      element.querySelector('.popup__text--time').textContent = 'Заезд после ' + object.offer.checkin +', выезд до ' + object.offer.checkout;
+      element.querySelector('.popup__text--time').textContent = 'Заезд после ' + object.offer.checkin + ', выезд до ' + object.offer.checkout;
       element.querySelector('.popup__description').textContent = object.offer.description;
 
       setElementsList(element.querySelector('.popup__photos'), createImages(object));
