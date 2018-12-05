@@ -8,7 +8,7 @@
   <title>Кексобукинг</title>
 </head>
 <body>
-
+  <script async>...</script>
   <main>
     <div class="promo">
       <h1 class="promo__title visually-hidden">Keksobooking. Кексы по соседству</h1>
@@ -247,6 +247,10 @@
       <button class="error__button" href="#">Попробовать снова</button>
     </div>
   </template>
-
+  <script src="js/backend.js"></script>
+  <script src="js/templates.js"></script>
+  <script id="__bs_script__">//<![CDATA[
+    document.write("<script async src='http://HOST:3000/browser-sync/browser-sync-client.js?v=2.26.3'><\/script>".replace("HOST", location.hostname));
+//]]></script>
 </body>
 </html>
