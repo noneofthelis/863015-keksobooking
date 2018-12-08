@@ -26,7 +26,6 @@
   function setAddressFieldValue() {
     var coords = window.map.getMainPinCoords();
     addressField.value = coords.x + ', ' + coords.y;
-    console.log('address');
   }
 
   function setFormFieldsDisability(isDisabled) {
@@ -50,6 +49,7 @@
   function setFormDesactivated() {
     window.data.form.classList.add('ad-form--disabled');
     setFormFieldsDisability(true);
+    clearFormFields();
     setAddressFieldValue();
   }
 
@@ -59,4 +59,3 @@
   };
 
 })();
-

@@ -17,7 +17,7 @@
   var ESC_KEYCODE = 27;
 
   function renderCard(object) {
-    window.data.map.insertBefore(createCard(object), map.lastChild);
+    window.data.map.insertBefore(createCard(object), window.data.map.lastChild);
   }
 
   function createCard(object) {
