@@ -2,14 +2,12 @@
 
 (function () {
 
-  var MAIN_PIN = {
-    WIDTH: 65,
-    HEIGHT: 84,
-    DEFAULT_COORD_X: 570,
-    DEFAULT_COORD_Y: 375
-  };
+  var MAIN_PIN_WIDTH = 65;
+  var MAIN_PIN_HEIGHT = 84;
+  var MAIN_PIN_DEFAULT_COORD_X = 570;
+  var MAIN_PIN_DEFAULT_COORD_Y = 375;
 
-  var POSITION_LIMIT = {
+  var PositionLimit = {
     TOP: 130,
     RIGHT: 1125,
     BOTTOM: 630,
@@ -17,13 +15,21 @@
   };
 
   var mainPin = document.querySelector('.map__pin--main');
-  mainPin.addEventListener('mousedown', onMainPinMouseDown);
+  var map = document.querySelector('.map');
+  var objectsData = null;
 
-  function setMapDisabile() {
-    window.data.map.classList.add('map--faded');
-    setMainPinCoords(MAIN_PIN.DEFAULT_COORD_X, MAIN_PIN.DEFAULT_COORD_Y);
-    window.pin.removePins();
+  window.backend.getData(onGetDataSuccess, onGetDataError);
+
+  function onGetDataSuccess(data) {
+    window.map.objectsData = data.filter(function (object) {
+      return Object.keys(object.offer).length !== 0;
+    });
+    mainPin.addEventListener('mousedown', onMainPinMouseDown);
   }
+
+  function onGetDataError(data) {
+    document.querySelector('.map').textContent = data;
+  } /* проверить текст сообщения и нужен ли параметр дата*/
 
   function onMainPinMouseDown(evt) {
     document.addEventListener('mouseup', onMainPinMouseUp);
@@ -38,32 +44,44 @@
       var shiftX = startCoords.x - moveEvt.clientX;
       var shiftY = startCoords.y - moveEvt.clientY;
 
-      startCoords.x = moveEvt.clientX;
-      startCoords.y = moveEvt.clientY;
-
       var positionLeft = mainPin.offsetLeft - shiftX;
       var positionTop = mainPin.offsetTop - shiftY;
 
-      var X = Math.min(Math.max(positionLeft, POSITION_LIMIT.LEFT), POSITION_LIMIT.RIGHT);
-      var Y = Math.min(Math.max(positionTop, POSITION_LIMIT.TOP), POSITION_LIMIT.BOTTOM);
+      var X = Math.min(Math.max(positionLeft, PositionLimit.LEFT), PositionLimit.RIGHT);
+      var Y = Math.min(Math.max(positionTop, PositionLimit.TOP), PositionLimit.BOTTOM);
+
+      startCoords.x = moveEvt.clientX;
+      startCoords.y = moveEvt.clientY;
 
       setMainPinCoords(X, Y);
       getMainPinCoords(X, Y);
     }
 
     function onMainPinMouseUp() {
-      window.data.map.classList.remove('map--faded');
-      window.form.setFormActivated();
-      window.pin.renderPins();
+      setMapActive();
+      window.enableForm();
+      window.filters.enableFilters();
+
       document.removeEventListener('mouseup', onMainPinMouseUp);
       document.removeEventListener('mousemove', onMainPinMouseMove);
     }
   }
 
+  function setMapActive() {
+    map.classList.remove('map--faded');
+    window.pin.renderPins(window.map.objectsData);
+  }
+
+  function setMapDisable() {
+    map.classList.add('map--faded');
+    setMainPinCoords(MAIN_PIN_DEFAULT_COORD_X, MAIN_PIN_DEFAULT_COORD_Y);
+    window.pin.removePins();
+  }
+
   function calculateAddressCoords(x, y) {
     return {
-      x: Math.round(x + MAIN_PIN.WIDTH / 2),
-      y: Math.round(y + MAIN_PIN.HEIGHT)
+      x: Math.round(x + MAIN_PIN_WIDTH / 2),
+      y: Math.round(y + MAIN_PIN_HEIGHT)
     };
   }
 
@@ -80,9 +98,15 @@
     return calculateAddressCoords(coords.x, coords.y);
   }
 
+  function appendToMap(element) {
+    map.insertBefore(element, map.lastChild);
+  }
+
   window.map = {
+    objectsData: objectsData,
     getMainPinCoords: getMainPinCoords,
-    setMapDisabile: setMapDisabile
+    setMapDisable: setMapDisable,
+    appendToMap: appendToMap
   };
 
 })();

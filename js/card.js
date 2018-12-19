@@ -16,25 +16,61 @@
 
   var ESC_KEYCODE = 27;
 
+  function removeCurrentCard() {
+    var card = document.querySelector('.map__card');
+    if (card) {
+      card.remove();
+      window.pin.removePinActiveClass();
+      document.removeEventListener('keydown', onEscKeydown);
+    }
+  }
+
   function renderCard(object) {
-    window.data.map.insertBefore(createCard(object), window.data.map.lastChild);
+    window.map.appendToMap(createCard(object));
   }
 
   function createCard(object) {
     var element = document.querySelector('#card').content.querySelector('.map__card').cloneNode(true);
     var fragment = document.createDocumentFragment();
+    var features = element.querySelector('.popup__features');
+    var photos = element.querySelector('.popup__photos');
+    var avatar = element.querySelector('.popup__avatar');
+    var timeTextContent = 'Заезд после ' + object.offer.checkin + ', выезд до ' + object.offer.checkout;
+    var capacityTextContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
 
-    element.querySelector('.popup__avatar').src = object.author.avatar;
-    element.querySelector('.popup__title').textContent = object.offer.title;
-    element.querySelector('.popup__text--address').textContent = object.offer.address;
-    element.querySelector('.popup__text--price').alt = object.offer.price + '₽/ночь';
-    element.querySelector('.popup__type').textContent = apartmentsTypeMap[object.offer.type];
-    element.querySelector('.popup__text--capacity').textContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
-    element.querySelector('.popup__text--time').textContent = 'Заезд после ' + object.offer.checkin + ', выезд до ' + object.offer.checkout;
-    element.querySelector('.popup__description').textContent = object.offer.description;
+    function checkTextProperty(propToCheck, elem, textContentValue) {
+      if (propToCheck) {
+        elem.textContent = textContentValue;
+      } else {
+        elem.remove();
+      }
+    }
 
-    setElementsList(element.querySelector('.popup__photos'), createImages(object));
-    setElementsList(element.querySelector('.popup__features'), createFeaturesList(object));
+    checkTextProperty(object.offer.checkin && object.offer.checkout, element.querySelector('.popup__text--time'), timeTextContent);
+    checkTextProperty(object.offer.rooms && object.offer.guests, element.querySelector('.popup__text--capacity'), capacityTextContent);
+    checkTextProperty(object.offer.type, element.querySelector('.popup__type'), apartmentsTypeMap[object.offer.type]);
+    checkTextProperty(object.offer.price, element.querySelector('.popup__text--price'), object.offer.price + ' ₽/ночь');
+    checkTextProperty(object.offer.address, element.querySelector('.popup__text--address'), object.offer.address);
+    checkTextProperty(object.offer.description, element.querySelector('.popup__description'), object.offer.description);
+    checkTextProperty(object.offer.title, element.querySelector('.popup__title'), object.offer.title);
+
+    if (object.offer.photos.length) {
+      setElementsList(photos, createImages(object));
+    } else {
+      photos.remove();
+    }
+
+    if (object.offer.features.length) {
+      setElementsList(features, createFeaturesList(object));
+    } else {
+      features.remove();
+    }
+
+    if (object.author.avatar) {
+      avatar.src = object.author.avatar;
+    } else {
+      avatar.remove();
+    }
 
     element.querySelector('.popup__close').addEventListener('click', onCardCloseButtonClick);
     document.addEventListener('keydown', onEscKeydown);
@@ -42,25 +78,6 @@
     fragment.appendChild(element);
 
     return fragment;
-  }
-
-  function onCardCloseButtonClick() {
-    removeCurrentCard();
-  }
-
-  function onEscKeydown(evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      removeCurrentCard();
-    }
-  }
-
-  function removeCurrentCard() {
-    var card = document.querySelector('.map__card');
-    if (card) {
-      card.remove();
-      document.querySelector('.map__pin--active').classList.remove('map__pin--active');
-      document.removeEventListener('keydown', onEscKeydown);
-    }
   }
 
   function setElementsList(element, fragment) {
@@ -96,6 +113,16 @@
     }
 
     return fragment;
+  }
+
+  function onCardCloseButtonClick() {
+    removeCurrentCard();
+  }
+
+  function onEscKeydown(evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      removeCurrentCard();
+    }
   }
 
   window.card = {
