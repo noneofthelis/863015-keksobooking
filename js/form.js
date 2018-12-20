@@ -2,8 +2,15 @@
 
 (function () {
 
-  var addressField = document.querySelector('#address');
-  var fieldsets = window.data.form.querySelectorAll('fieldset');
+  var customValidityMessage = '';
+  var form = document.querySelector('.ad-form');
+  var titleInput = form.querySelector('#title');
+  var priceInput = form.querySelector('#price');
+  var timeInInput = form.querySelector('#timein');
+  var timeOutInput = form.querySelector('#timeout');
+  var roomsNumberInput = form.querySelector('#room_number');
+  var capacityInput = form.querySelector('#capacity');
+  var apartmentType = form.querySelector('#type');
 
   var apartmentTypeToPriceMap = {
     bungalo: 0,
@@ -19,73 +26,45 @@
     '100': ['0']
   };
 
-  var customValidityMessage = '';
-  var titleInput = window.data.form.querySelector('#title');
-  var priceInput = window.data.form.querySelector('#price');
-  var timeInInput = window.data.form.querySelector('#timein');
-  var timeOutInput = window.data.form.querySelector('#timeout');
-  var roomsNumberInput = window.data.form.querySelector('#room_number');
-  var capacityInput = window.data.form.querySelector('#capacity');
-  var apartmentType = window.data.form.querySelector('#type');
-
-  addressField.readOnly = true;
-
+  initForm();
   initHandlers();
-  disableUnsuitableOptions();
-  setRoomsNumberValidity();
-  setPriceInputMinAttr();
 
   function initHandlers() {
-    document.querySelector('.ad-form__reset').addEventListener('click', onFormResetClick);
+    form.addEventListener('submit', onFormSubmit);
     titleInput.addEventListener('input', onTitleInputChange);
     priceInput.addEventListener('input', onPriceInputChange);
     apartmentType.addEventListener('change', onApartmentTypeChange);
     timeInInput.addEventListener('change', onTimeInInputChange);
     timeOutInput.addEventListener('change', onTimeOutInputChange);
     roomsNumberInput.addEventListener('change', onRoomsNumberInputChange);
-    window.data.form.addEventListener('submit', onFormSubmit);
+    document.querySelector('.ad-form__reset').addEventListener('click', onFormResetClick);
   }
 
-  function onFormResetClick() {
-    window.map.setMapDisabile();
-    addressField.readOnly = false; // сделать логично
+  function initForm() {
+    disableUnsuitableOptions();
+    setRoomsNumberValidity();
+    setPriceInputMinAttr();
     setAddressFieldValue();
-    setFormDesactivated();
   }
 
-  function setAddressFieldValue() {
-    var coords = window.map.getMainPinCoords();
-    addressField.value = coords.x + ', ' + coords.y;
-  }
-
-  function setFormFieldsDisability(isDisabled) {
-    for (var i = 0; i < fieldsets.length; i++) {
-      fieldsets[i].disabled = isDisabled;
-    }
-  }
-
-  function clearFormFields() {
-    for (var i = 0; i < fieldsets.length; i++) {
-      fieldsets[i].value = '';
-    }
-  }
-
-  function setFormActivated() {
-    window.data.form.classList.remove('ad-form--disabled');
+  function enableForm() {
+    form.classList.remove('ad-form--disabled');
     setFormFieldsDisability(false);
     setAddressFieldValue();
   }
 
-  function setFormDesactivated() {
-    window.data.form.classList.add('ad-form--disabled');
+  function disableForm() {
+    form.classList.add('ad-form--disabled');
     setFormFieldsDisability(true);
-    clearFormFields();
+    form.reset();
     setAddressFieldValue();
   }
 
-  function onRoomsNumberInputChange(evt) {
-    disableUnsuitableOptions();
-    setRoomsNumberValidity(evt);
+  function setPageDisabledState() {
+    window.map.setMapDisable();
+    window.filters.disableFilters();
+    setAddressFieldValue();
+    disableForm();
   }
 
   function disableUnsuitableOptions() {
@@ -111,51 +90,24 @@
     roomsNumberInput.setCustomValidity(customValidityMessage);
   }
 
-
-  function onFormSubmit(evt) {
-    sendData(evt);
+  function setPriceInputMinAttr() {
+    priceInput.min = apartmentTypeToPriceMap[apartmentType.value];
   }
 
-  function sendData(evt) {
-    window.backend.postData(new FormData(evt.currentTarget), onPostDataSuccess, onPostDataError);
-    evt.preventDefault();
+  function setAddressFieldValue() {
+    var coords = window.map.getMainPinCoords();
+    form.querySelector('#address').value = coords.x + ', ' + coords.y;
   }
 
-  function onPostDataSuccess() {
-    clearFormFields();
-  }
-
-  function onPostDataError() {
-
-  }
-
-  function onTimeInInputChange(evt) {
-    matchTimeInAndOut(evt.target, timeOutInput);
-  }
-
-  function onTimeOutInputChange(evt) {
-    matchTimeInAndOut(evt.target, timeInInput);
+  function setFormFieldsDisability(disability) {
+    var fieldsets = form.querySelectorAll('fieldset');
+    fieldsets.forEach(function (fieldset) {
+      fieldset.disabled = disability;
+    });
   }
 
   function matchTimeInAndOut(changedInput, inputToChange) {
     inputToChange.value = changedInput.value;
-  }
-
-  function onApartmentTypeChange() {
-    setPriceInputPlaceholder();
-    setPriceInputMinAttr();
-  }
-
-  function onTitleInputChange(evt) {
-    checkTitleInputValidity(evt.target);
-  }
-
-  function onPriceInputChange(evt) {
-    checkPriceInputValidity(evt.target);
-  }
-
-  function setPriceInputMinAttr() {
-    priceInput.min = apartmentTypeToPriceMap[apartmentType.value];
   }
 
   function setPriceInputPlaceholder() {
@@ -184,9 +136,54 @@
     input.setCustomValidity(customValidityMessage);
   }
 
-  window.form = {
-    setFormActivated: setFormActivated,
-    setFormDesactivated: setFormDesactivated,
-  };
+  function sendData(evt) {
+    evt.preventDefault();
+    window.backend.postData(new FormData(evt.currentTarget), onPostDataSuccess, onPostDataError);
+  }
+
+  function onPostDataSuccess() {
+    setPageDisabledState();
+    window.showCallbackMessage('success');
+  }
+
+  function onPostDataError() {
+    window.showCallbackMessage('error');
+  }
+
+  function onFormSubmit(evt) {
+    sendData(evt);
+  }
+
+  function onFormResetClick() {
+    setPageDisabledState();
+  }
+
+  function onTimeInInputChange(evt) {
+    matchTimeInAndOut(evt.target, timeOutInput);
+  }
+
+  function onTimeOutInputChange(evt) {
+    matchTimeInAndOut(evt.target, timeInInput);
+  }
+
+  function onApartmentTypeChange() {
+    setPriceInputPlaceholder();
+    setPriceInputMinAttr();
+  }
+
+  function onTitleInputChange(evt) {
+    checkTitleInputValidity(evt.target);
+  }
+
+  function onPriceInputChange(evt) {
+    checkPriceInputValidity(evt.target);
+  }
+
+  function onRoomsNumberInputChange(evt) {
+    disableUnsuitableOptions();
+    setRoomsNumberValidity(evt);
+  }
+
+  window.enableForm = enableForm;
 
 })();
