@@ -7,16 +7,16 @@
   var MAIN_PIN_DEFAULT_COORD_X = 570;
   var MAIN_PIN_DEFAULT_COORD_Y = 375;
 
-  var PositionLimit = {
-    TOP: 130,
-    RIGHT: 1125,
-    BOTTOM: 630,
-    LEFT: 0
-  };
 
   var mainPin = document.querySelector('.map__pin--main');
   var map = document.querySelector('.map');
   var objectsData = null;
+
+  var PositionLimit = {
+    TOP: 130,
+    BOTTOM: 630,
+    LEFT: 0
+  };
 
   window.backend.getData(onGetDataSuccess, onGetDataError);
 
@@ -30,7 +30,7 @@
 
   function onGetDataError(data) {
     document.querySelector('.map').textContent = data;
-  } /* проверить текст сообщения и нужен ли параметр дата*/
+  }
 
   function onMainPinMouseDown(evt) {
     document.addEventListener('mouseup', onMainPinMouseUp);
@@ -48,7 +48,7 @@
       var positionLeft = mainPin.offsetLeft - shiftX;
       var positionTop = mainPin.offsetTop - shiftY;
 
-      var coordX = Math.min(Math.max(positionLeft, PositionLimit.LEFT), PositionLimit.RIGHT);
+      var coordX = Math.min(Math.max(positionLeft, PositionLimit.LEFT), map.offsetWidth - mainPin.offsetWidth);
       var coordY = Math.min(Math.max(positionTop, PositionLimit.TOP), PositionLimit.BOTTOM);
 
       startCoords.x = moveEvt.clientX;

@@ -13,9 +13,9 @@
     fragment.appendChild(template);
     mainBlock.appendChild(fragment);
 
-    if (selector === 'error') { // может все же разделить функции
+    if (selector === 'error') {
       document.querySelector('.error__button')
-              .addEventListener('keypress', onErrorButtonEnterPress);
+              .addEventListener('keydown', onErrorButtonEnterPress);
     }
   }
 

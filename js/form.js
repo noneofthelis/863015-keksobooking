@@ -60,6 +60,13 @@
     setAddressFieldValue();
   }
 
+  function setPageDisabledState() {
+    window.map.setMapDisable();
+    window.filters.disableFilters();
+    setAddressFieldValue();
+    disableForm();
+  }
+
   function disableUnsuitableOptions() {
     var guests = capacityInput.children;
     for (var i = 0; i < guests.length; i++) {
@@ -127,13 +134,6 @@
       customValidityMessage = '';
     }
     input.setCustomValidity(customValidityMessage);
-  }
-
-  function setPageDisabledState() {
-    window.map.setMapDisable();
-    window.filters.disableFilters();
-    setAddressFieldValue();
-    disableForm();
   }
 
   function sendData(evt) {
