@@ -25,6 +25,7 @@
       return Object.keys(object.offer).length !== 0;
     });
     mainPin.addEventListener('mousedown', onMainPinMouseDown);
+    mainPin.addEventListener('keypress', onMainPinEnter);
   }
 
   function onGetDataError(data) {
@@ -47,14 +48,14 @@
       var positionLeft = mainPin.offsetLeft - shiftX;
       var positionTop = mainPin.offsetTop - shiftY;
 
-      var X = Math.min(Math.max(positionLeft, PositionLimit.LEFT), PositionLimit.RIGHT);
-      var Y = Math.min(Math.max(positionTop, PositionLimit.TOP), PositionLimit.BOTTOM);
+      var coordX = Math.min(Math.max(positionLeft, PositionLimit.LEFT), PositionLimit.RIGHT);
+      var coordY = Math.min(Math.max(positionTop, PositionLimit.TOP), PositionLimit.BOTTOM);
 
       startCoords.x = moveEvt.clientX;
       startCoords.y = moveEvt.clientY;
 
-      setMainPinCoords(X, Y);
-      getMainPinCoords(X, Y);
+      setMainPinCoords(coordX, coordY);
+      getMainPinCoords(coordX, coordY);
     }
 
     function onMainPinMouseUp() {
@@ -64,6 +65,14 @@
 
       document.removeEventListener('mouseup', onMainPinMouseUp);
       document.removeEventListener('mousemove', onMainPinMouseMove);
+    }
+  }
+
+  function onMainPinEnter(evt) {
+    if (evt.keyCode === window.KeyCode.ENTER) {
+      setMapActive();
+      window.enableForm();
+      window.filters.enableFilters();
     }
   }
 

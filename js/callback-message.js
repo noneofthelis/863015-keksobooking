@@ -12,6 +12,11 @@
     });
     fragment.appendChild(template);
     mainBlock.appendChild(fragment);
+
+    if (selector === 'error') { // может все же разделить функции
+      document.querySelector('.error__button')
+              .addEventListener('keypress', onErrorButtonEnterPress);
+    }
   }
 
   function showCallbackMessage(selector) {
@@ -30,7 +35,13 @@
   }
 
   function onEscPress(evt) {
-    if (evt.keyCode === 27) {
+    if (evt.keyCode === window.KeyCode.ESC) {
+      closeMessage();
+    }
+  }
+
+  function onErrorButtonEnterPress(evt) {
+    if (evt.keyCode === window.KeyCode.ENTER) {
       closeMessage();
     }
   }

@@ -8,6 +8,12 @@
   var apartmentRooms = filters.querySelector('#housing-rooms');
   var apartmentCapacity = filters.querySelector('#housing-guests');
 
+  var DEBOUNCE_INTERVAL = 500;
+  var PriceThreshold = {
+    LOW: 10000,
+    HIGH: 50000
+  };
+
   var filterChecks = {
     type: function (object) {
       return apartmentType.value === 'any' ? true : object.offer.type === apartmentType.value;
@@ -23,13 +29,13 @@
       var price = object.offer.price;
       switch (apartmentPrice.value) {
         case 'low':
-          priceInterval = price < 10000;
+          priceInterval = price < PriceThreshold.LOW;
           break;
         case 'middle':
-          priceInterval = price >= 10000 && price <= 50000;
+          priceInterval = price >= PriceThreshold.LOW && price <= PriceThreshold.HIGH;
           break;
         case 'high':
-          priceInterval = price > 50000;
+          priceInterval = price > PriceThreshold.HIGH;
           break;
       }
       return priceInterval;
@@ -60,7 +66,9 @@
   }
 
   function onFiltersChange() {
-    filterOffers();
+    window.debounce(function () {
+      filterOffers();
+    }, DEBOUNCE_INTERVAL)();
   }
 
   function setFiltersDisability(disability) {

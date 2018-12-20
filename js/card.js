@@ -2,7 +2,7 @@
 
 (function () {
 
-  var MODAL_PHOTO = {
+  var CARD_PHOTO = {
     WIDTH: 45,
     HEIGHT: 40
   };
@@ -13,8 +13,6 @@
     house: 'Дом',
     palace: 'Дворец'
   };
-
-  var ESC_KEYCODE = 27;
 
   function removeCurrentCard() {
     var card = document.querySelector('.map__card');
@@ -35,42 +33,55 @@
     var features = element.querySelector('.popup__features');
     var photos = element.querySelector('.popup__photos');
     var avatar = element.querySelector('.popup__avatar');
+    var time = element.querySelector('.popup__text--time');
+    var type = element.querySelector('.popup__text--time');
+    var price = element.querySelector('.popup__text--price');
+    var title = element.querySelector('.popup__text--price');
+    var capacity = element.querySelector('.popup__text--capacity');
+    var address = element.querySelector('.popup__text--address');
+    var description = element.querySelector('.popup__description');
     var timeTextContent = 'Заезд после ' + object.offer.checkin + ', выезд до ' + object.offer.checkout;
     var capacityTextContent = object.offer.rooms + ' комнаты для ' + object.offer.guests + ' гостей';
 
-    function checkTextProperty(propToCheck, elem, textContentValue) {
-      if (propToCheck) {
-        elem.textContent = textContentValue;
-      } else {
-        elem.remove();
-      }
-    }
-
-    checkTextProperty(object.offer.checkin && object.offer.checkout, element.querySelector('.popup__text--time'), timeTextContent);
-    checkTextProperty(object.offer.rooms && object.offer.guests, element.querySelector('.popup__text--capacity'), capacityTextContent);
-    checkTextProperty(object.offer.type, element.querySelector('.popup__type'), apartmentsTypeMap[object.offer.type]);
-    checkTextProperty(object.offer.price, element.querySelector('.popup__text--price'), object.offer.price + ' ₽/ночь');
-    checkTextProperty(object.offer.address, element.querySelector('.popup__text--address'), object.offer.address);
-    checkTextProperty(object.offer.description, element.querySelector('.popup__description'), object.offer.description);
-    checkTextProperty(object.offer.title, element.querySelector('.popup__title'), object.offer.title);
-
-    if (object.offer.photos.length) {
-      setElementsList(photos, createImages(object));
-    } else {
-      photos.remove();
-    }
-
-    if (object.offer.features.length) {
-      setElementsList(features, createFeaturesList(object));
-    } else {
-      features.remove();
-    }
-
-    if (object.author.avatar) {
+    setProperty(function () {
       avatar.src = object.author.avatar;
-    } else {
-      avatar.remove();
-    }
+    }, avatar, object.author.avatar);
+
+    setProperty(function () {
+      setTextContent(title, object.offer.title);
+    }, title, object.offer.title);
+
+    setProperty(function () {
+      setTextContent(address, object.offer.address);
+    }, address, object.offer.address);
+
+    setProperty(function () {
+      setTextContent(price, object.offer.price + ' ₽/ночь');
+    }, price, object.offer.price);
+
+    setProperty(function () {
+      setTextContent(time, timeTextContent);
+    }, time, object.offer.checkin && object.offer.checkout);
+
+    setProperty(function () {
+      setTextContent(capacity, capacityTextContent);
+    }, capacity, object.offer.rooms && object.offer.guests);
+
+    setProperty(function () {
+      setTextContent(type, apartmentsTypeMap[object.offer.type]);
+    }, type, object.offer.type);
+
+    setProperty(function () {
+      setTextContent(description, object.offer.description);
+    }, description, object.offer.description);
+
+    setProperty(function () {
+      setElementsList(features, createFeaturesList(object));
+    }, features, object.offer.features.length);
+
+    setProperty(function () {
+      setElementsList(photos, createImages(object));
+    }, photos, object.offer.photos.length);
 
     element.querySelector('.popup__close').addEventListener('click', onCardCloseButtonClick);
     document.addEventListener('keydown', onEscKeydown);
@@ -78,6 +89,18 @@
     fragment.appendChild(element);
 
     return fragment;
+  }
+
+  function setTextContent(elem, textContentValue) {
+    elem.textContent = textContentValue;
+  }
+
+  function setProperty(action, elem, propToCheck) {
+    if (propToCheck) {
+      action();
+    } else {
+      elem.remove();
+    }
   }
 
   function setElementsList(element, fragment) {
@@ -106,8 +129,8 @@
       var element = document.createElement('img');
       element.src = images[i];
       element.className = 'popup__photo';
-      element.width = MODAL_PHOTO.WIDTH;
-      element.height = MODAL_PHOTO.HEIGHT;
+      element.width = CARD_PHOTO.WIDTH;
+      element.height = CARD_PHOTO.HEIGHT;
       element.alt = object.offer.title;
       fragment.appendChild(element);
     }
@@ -120,7 +143,7 @@
   }
 
   function onEscKeydown(evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
+    if (evt.keyCode === window.KeyCode.ESC) {
       removeCurrentCard();
     }
   }
